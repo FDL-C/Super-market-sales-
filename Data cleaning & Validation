@@ -1,0 +1,39 @@
+Data cleaning and validation are critical steps that should ideally be
+performed before any analysis to ensure the results are accurate and reliable. 
+I will now perform a comprehensive data quality check on the Supermarket dataset, 
+focusing on duplicates, null values, data consistency, and integrity.
+
+Data Quality & Integrity Report:
+Before proceeding with further analysis, I have conducted a thorough 
+audit of the Supermarket.csv dataset. Ensuring data quality is essential 
+for the reliability of our business insights.
+1. Missing Values (Nulls):
+•Findings: There are 31 missing values in both the unit_price and quantity columns.
+•Impact: These rows cannot be used for revenue or profit calculations.
+•Recommendation: These records should be excluded from financial analysis or 
+ investigated for data entry errors.
+2. Duplicate Records:
+•Findings: I identified 51 duplicate rows in the dataset.
+•Impact: Duplicates artificially inflate sales volume and revenue figures.
+•Recommendation: Remove these duplicates to ensure each transaction is counted only once.
+3. Data Consistency & Integrity: 
+•Branch & City: All branches are consistently mapped to their respective cities, showing strong geographic integrity.
+•Time Formats: Approximately 1,291 entries use a non-standard time format (e.g., 8:53:00 instead of 08:53:00). 
+ While parseable, this indicates a lack of strict formatting during data collection.
+•Numerical Ranges:
+•Ratings: All ratings fall within the valid 3.0 to 10.0 range.
+•Prices: Unit prices are consistent, ranging from $10.08 to $99.96.
+•Quantities: Most transactions involve 1-3 items, but there are 398 transactions 
+  with quantities up to 10, which are statistically higher than average but still plausible for a supermarket.
+4. Unaccountable Values: 
+•No obvious placeholders (like "?", "N/A", or "None") were found in the categorical columns,
+suggesting that the text data is relatively clean.
+
+Data cleaning summary: 
+DeDuplication: Removed 51 duplicates rows to prevent inflation of sales figures. 
+Handling Nulls. Removed 31 rows with missing unique_price or quantity values as these are critical for financial calculations.
+standardization: converted unique_price to a clean format (Removed$ , ensured quantity is an integer, and standardized date and time format)
+
+Conclusion: 
+The dataset is generally high-quality but requires deduplication and handling of 
+missing values before final business reporting to ensure the highest accuracy.
