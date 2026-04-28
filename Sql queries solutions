@@ -1,0 +1,837 @@
+# Supermarket Business Analysis: Cleaned SQL Report
+
+This report contains the SQL queries and outputs executed on the **cleaned dataset** (deduplicated and null-handled).
+
+## 1. Payment Methods and Sales
+```sql
+SELECT 
+            payment_method, 
+            COUNT(invoice_id) AS transaction_count, 
+            SUM(quantity) AS total_items_sold
+        FROM sales
+        GROUP BY payment_method;
+```
+
+### Output:
+| payment_method   |   transaction_count |   total_items_sold |
+|:-----------------|--------------------:|-------------------:|
+| Cash             |                1832 |               4984 |
+| Credit card      |                4256 |               9567 |
+| Ewallet          |                3881 |               8932 |
+
+---
+
+## 2. Highest-Rated Category in Each Branch
+```sql
+WITH CategoryRatings AS (
+            SELECT Branch, category, AVG(rating) AS avg_rating
+            FROM sales
+            GROUP BY Branch, category
+        ),
+        RankedCategories AS (
+            SELECT Branch, category, avg_rating,
+                   RANK() OVER (PARTITION BY Branch ORDER BY avg_rating DESC) as rank
+            FROM CategoryRatings
+        )
+        SELECT Branch, category, ROUND(avg_rating, 2) as avg_rating
+        FROM RankedCategories
+        WHERE rank = 1;
+```
+
+### Output:
+| Branch   | category               |   avg_rating |
+|:---------|:-----------------------|-------------:|
+| WALM001  | Electronic accessories |         7.45 |
+| WALM002  | Food and beverages     |         8.25 |
+| WALM003  | Sports and travel      |         7.5  |
+| WALM004  | Food and beverages     |         9.3  |
+| WALM005  | Health and beauty      |         8.37 |
+| WALM006  | Fashion accessories    |         6.8  |
+| WALM007  | Food and beverages     |         7.55 |
+| WALM008  | Food and beverages     |         7.4  |
+| WALM009  | Sports and travel      |         9.6  |
+| WALM010  | Electronic accessories |         9    |
+| WALM011  | Food and beverages     |         7    |
+| WALM012  | Health and beauty      |         7.45 |
+| WALM013  | Health and beauty      |         7.6  |
+| WALM014  | Electronic accessories |         6.83 |
+| WALM015  | Home and lifestyle     |         6.22 |
+| WALM016  | Sports and travel      |         9.1  |
+| WALM017  | Electronic accessories |         7    |
+| WALM018  | Electronic accessories |         8.75 |
+| WALM019  | Electronic accessories |         8.4  |
+| WALM020  | Food and beverages     |         8.33 |
+| WALM021  | Sports and travel      |         7.2  |
+| WALM022  | Health and beauty      |         8.8  |
+| WALM023  | Health and beauty      |         8    |
+| WALM024  | Electronic accessories |         8.7  |
+| WALM025  | Food and beverages     |         8.4  |
+| WALM026  | Health and beauty      |         6.85 |
+| WALM027  | Health and beauty      |         9.7  |
+| WALM028  | Food and beverages     |         8    |
+| WALM029  | Food and beverages     |         8.9  |
+| WALM030  | Sports and travel      |         8.6  |
+| WALM031  | Electronic accessories |         7.57 |
+| WALM032  | Fashion accessories    |         5.54 |
+| WALM033  | Home and lifestyle     |         6.66 |
+| WALM034  | Health and beauty      |        10    |
+| WALM035  | Sports and travel      |         9.3  |
+| WALM036  | Fashion accessories    |         6.59 |
+| WALM037  | Sports and travel      |         9.35 |
+| WALM038  | Sports and travel      |         8.5  |
+| WALM039  | Food and beverages     |         9.03 |
+| WALM040  | Health and beauty      |         8.6  |
+| WALM041  | Food and beverages     |         8    |
+| WALM042  | Sports and travel      |         7.25 |
+| WALM043  | Sports and travel      |         6.45 |
+| WALM044  | Health and beauty      |         9.2  |
+| WALM045  | Food and beverages     |         9.3  |
+| WALM046  | Food and beverages     |         7.3  |
+| WALM047  | Health and beauty      |         7.95 |
+| WALM048  | Electronic accessories |         9.6  |
+| WALM049  | Sports and travel      |         7.67 |
+| WALM050  | Electronic accessories |         5.28 |
+| WALM051  | Sports and travel      |         8.9  |
+| WALM052  | Electronic accessories |         7.75 |
+| WALM053  | Sports and travel      |         8    |
+| WALM054  | Health and beauty      |         5.6  |
+| WALM055  | Food and beverages     |         7.5  |
+| WALM056  | Electronic accessories |         5.97 |
+| WALM057  | Food and beverages     |         6.77 |
+| WALM058  | Health and beauty      |         6.3  |
+| WALM059  | Electronic accessories |         7.9  |
+| WALM060  | Health and beauty      |         9.9  |
+| WALM061  | Food and beverages     |         8.47 |
+| WALM062  | Sports and travel      |         7.3  |
+| WALM063  | Electronic accessories |         8.33 |
+| WALM064  | Health and beauty      |         8.15 |
+| WALM065  | Health and beauty      |         6.53 |
+| WALM066  | Health and beauty      |         7.2  |
+| WALM066  | Sports and travel      |         7.2  |
+| WALM067  | Sports and travel      |         9.7  |
+| WALM068  | Electronic accessories |         9.7  |
+| WALM069  | Sports and travel      |         7.76 |
+| WALM070  | Food and beverages     |         9.1  |
+| WALM071  | Food and beverages     |         8.6  |
+| WALM072  | Sports and travel      |         8.1  |
+| WALM073  | Food and beverages     |         9.6  |
+| WALM074  | Food and beverages     |         8.73 |
+| WALM075  | Sports and travel      |         7.9  |
+| WALM076  | Food and beverages     |         8.1  |
+| WALM077  | Sports and travel      |         9.6  |
+| WALM078  | Food and beverages     |         9    |
+| WALM079  | Sports and travel      |         7.17 |
+| WALM080  | Electronic accessories |         7.2  |
+| WALM081  | Food and beverages     |         9.1  |
+| WALM082  | Health and beauty      |         9.2  |
+| WALM083  | Electronic accessories |         6.57 |
+| WALM084  | Sports and travel      |         5.47 |
+| WALM085  | Food and beverages     |         8.4  |
+| WALM086  | Health and beauty      |         9.9  |
+| WALM087  | Health and beauty      |         7.2  |
+| WALM088  | Sports and travel      |         7.67 |
+| WALM089  | Sports and travel      |         8.9  |
+| WALM090  | Sports and travel      |         8.13 |
+| WALM091  | Electronic accessories |         6.25 |
+| WALM092  | Health and beauty      |         7.2  |
+| WALM093  | Food and beverages     |         7.7  |
+| WALM094  | Health and beauty      |         7.95 |
+| WALM095  | Health and beauty      |         7.73 |
+| WALM096  | Sports and travel      |         9.6  |
+| WALM097  | Food and beverages     |         7.68 |
+| WALM098  | Health and beauty      |         9.8  |
+| WALM099  | Electronic accessories |         5.95 |
+| WALM100  | Health and beauty      |         6.9  |
+
+---
+
+## 3. Busiest Day for Each Branch
+```sql
+WITH DayCounts AS (
+            SELECT Branch, strftime('%w', date) as day_of_week, COUNT(*) as transaction_count
+            FROM sales
+            GROUP BY Branch, day_of_week
+        ),
+        RankedDays AS (
+            SELECT Branch, day_of_week, transaction_count,
+                   RANK() OVER (PARTITION BY Branch ORDER BY transaction_count DESC) as rank
+            FROM DayCounts
+        )
+        SELECT Branch, 
+               CASE day_of_week 
+                   WHEN '0' THEN 'Sunday' WHEN '1' THEN 'Monday' WHEN '2' THEN 'Tuesday'
+                   WHEN '3' THEN 'Wednesday' WHEN '4' THEN 'Thursday' WHEN '5' THEN 'Friday'
+                   WHEN '6' THEN 'Saturday' END as busiest_day,
+               transaction_count
+        FROM RankedDays
+        WHERE rank = 1;
+```
+
+### Output:
+| Branch   | busiest_day   |   transaction_count |
+|:---------|:--------------|--------------------:|
+| WALM001  | Thursday      |                  16 |
+| WALM002  | Thursday      |                  15 |
+| WALM003  | Tuesday       |                  33 |
+| WALM004  | Sunday        |                  14 |
+| WALM005  | Wednesday     |                  19 |
+| WALM006  | Thursday      |                  15 |
+| WALM007  | Sunday        |                  12 |
+| WALM007  | Friday        |                  12 |
+| WALM008  | Tuesday       |                  17 |
+| WALM009  | Sunday        |                  42 |
+| WALM010  | Wednesday     |                  12 |
+| WALM011  | Tuesday       |                  18 |
+| WALM012  | Sunday        |                  20 |
+| WALM013  | Monday        |                  13 |
+| WALM014  | Sunday        |                  12 |
+| WALM015  | Friday        |                  15 |
+| WALM016  | Tuesday       |                  16 |
+| WALM017  | Thursday      |                  17 |
+| WALM018  | Sunday        |                  12 |
+| WALM019  | Thursday      |                  13 |
+| WALM020  | Tuesday       |                  16 |
+| WALM021  | Thursday      |                  12 |
+| WALM022  | Friday        |                  15 |
+| WALM023  | Tuesday       |                  17 |
+| WALM024  | Sunday        |                  14 |
+| WALM025  | Tuesday       |                  26 |
+| WALM025  | Thursday      |                  26 |
+| WALM025  | Saturday      |                  26 |
+| WALM026  | Sunday        |                  17 |
+| WALM027  | Thursday      |                  14 |
+| WALM028  | Saturday      |                  18 |
+| WALM029  | Thursday      |                  36 |
+| WALM030  | Wednesday     |                  40 |
+| WALM031  | Sunday        |                  13 |
+| WALM032  | Tuesday       |                  30 |
+| WALM033  | Thursday      |                  10 |
+| WALM033  | Saturday      |                  10 |
+| WALM034  | Wednesday     |                  12 |
+| WALM035  | Saturday      |                  32 |
+| WALM036  | Thursday      |                  16 |
+| WALM037  | Tuesday       |                  13 |
+| WALM038  | Sunday        |                  37 |
+| WALM039  | Wednesday     |                  15 |
+| WALM040  | Saturday      |                  13 |
+| WALM041  | Friday        |                  15 |
+| WALM042  | Wednesday     |                  15 |
+| WALM043  | Tuesday       |                  18 |
+| WALM044  | Sunday        |                  18 |
+| WALM045  | Wednesday     |                  13 |
+| WALM046  | Wednesday     |                  35 |
+| WALM047  | Sunday        |                  15 |
+| WALM048  | Monday        |                  18 |
+| WALM049  | Wednesday     |                  17 |
+| WALM050  | Sunday        |                  32 |
+| WALM051  | Monday        |                  11 |
+| WALM051  | Tuesday       |                  11 |
+| WALM051  | Thursday      |                  11 |
+| WALM051  | Friday        |                  11 |
+| WALM052  | Tuesday       |                  17 |
+| WALM053  | Thursday      |                  17 |
+| WALM054  | Sunday        |                  32 |
+| WALM055  | Wednesday     |                  32 |
+| WALM056  | Wednesday     |                  29 |
+| WALM056  | Saturday      |                  29 |
+| WALM057  | Wednesday     |                  18 |
+| WALM058  | Wednesday     |                  45 |
+| WALM059  | Monday        |                  15 |
+| WALM060  | Tuesday       |                  14 |
+| WALM061  | Thursday      |                  14 |
+| WALM062  | Tuesday       |                  24 |
+| WALM063  | Sunday        |                  17 |
+| WALM064  | Saturday      |                  14 |
+| WALM065  | Tuesday       |                  30 |
+| WALM065  | Friday        |                  30 |
+| WALM066  | Wednesday     |                  15 |
+| WALM067  | Sunday        |                  14 |
+| WALM068  | Monday        |                  11 |
+| WALM068  | Thursday      |                  11 |
+| WALM069  | Thursday      |                  42 |
+| WALM070  | Sunday        |                  15 |
+| WALM071  | Sunday        |                  16 |
+| WALM072  | Thursday      |                  14 |
+| WALM073  | Thursday      |                  30 |
+| WALM074  | Wednesday     |                  41 |
+| WALM075  | Friday        |                  35 |
+| WALM076  | Thursday      |                  14 |
+| WALM077  | Saturday      |                  12 |
+| WALM078  | Saturday      |                  17 |
+| WALM079  | Sunday        |                  12 |
+| WALM079  | Wednesday     |                  12 |
+| WALM080  | Monday        |                  16 |
+| WALM081  | Tuesday       |                  11 |
+| WALM081  | Saturday      |                  11 |
+| WALM082  | Thursday      |                  40 |
+| WALM083  | Monday        |                  17 |
+| WALM084  | Tuesday       |                  35 |
+| WALM085  | Tuesday       |                  14 |
+| WALM085  | Thursday      |                  14 |
+| WALM086  | Tuesday       |                  31 |
+| WALM087  | Saturday      |                  35 |
+| WALM088  | Wednesday     |                  16 |
+| WALM089  | Monday        |                  31 |
+| WALM089  | Saturday      |                  31 |
+| WALM090  | Wednesday     |                  15 |
+| WALM091  | Wednesday     |                  17 |
+| WALM092  | Thursday      |                  11 |
+| WALM093  | Wednesday     |                  12 |
+| WALM094  | Tuesday       |                  17 |
+| WALM095  | Thursday      |                  18 |
+| WALM096  | Tuesday       |                  15 |
+| WALM097  | Friday        |                  12 |
+| WALM098  | Monday        |                  18 |
+| WALM099  | Sunday        |                  30 |
+| WALM100  | Wednesday     |                  14 |
+
+---
+
+## 4. Total Quantity Sold by Payment Method
+```sql
+SELECT 
+            payment_method, 
+            SUM(quantity) AS total_quantity
+        FROM sales
+        GROUP BY payment_method;
+```
+
+### Output:
+| payment_method   |   total_quantity |
+|:-----------------|-----------------:|
+| Cash             |             4984 |
+| Credit card      |             9567 |
+| Ewallet          |             8932 |
+
+---
+
+## 5. Category Ratings by City
+```sql
+SELECT 
+            City, category, 
+            ROUND(AVG(rating), 2) AS avg_rating, 
+            MIN(rating) AS min_rating, 
+            MAX(rating) AS max_rating
+        FROM sales
+        GROUP BY City, category
+        LIMIT 10;
+```
+
+### Output:
+| City    | category               |   avg_rating |   min_rating |   max_rating |
+|:--------|:-----------------------|-------------:|-------------:|-------------:|
+| Abilene | Electronic accessories |         7.97 |          7.1 |          8.8 |
+| Abilene | Fashion accessories    |         6.24 |          4   |          9   |
+| Abilene | Food and beverages     |         6.95 |          6   |          8.9 |
+| Abilene | Health and beauty      |         9.7  |          9.7 |          9.7 |
+| Abilene | Home and lifestyle     |         6.1  |          4   |          9   |
+| Alamo   | Fashion accessories    |         6.87 |          3   |          9   |
+| Alamo   | Food and beverages     |         5.2  |          5.2 |          5.2 |
+| Alamo   | Health and beauty      |         7.95 |          7.7 |          8.2 |
+| Alamo   | Home and lifestyle     |         6.3  |          3   |          9   |
+| Alamo   | Sports and travel      |         7.3  |          5   |         10   |
+
+---
+
+## 6. Total Profit by Category
+```sql
+SELECT 
+            category, 
+            ROUND(SUM(unit_price * quantity * profit_margin), 2) AS total_profit
+        FROM sales
+        GROUP BY category
+        ORDER BY total_profit DESC;
+```
+
+### Output:
+| category               |   total_profit |
+|:-----------------------|---------------:|
+| Fashion accessories    |       192315   |
+| Home and lifestyle     |       192214   |
+| Electronic accessories |        30772.5 |
+| Food and beverages     |        21552.9 |
+| Sports and travel      |        20613.8 |
+| Health and beauty      |        18671.7 |
+
+---
+
+## 7. Most Common Payment Method per Branch
+```sql
+WITH PaymentCounts AS (
+            SELECT Branch, payment_method, COUNT(*) as method_count
+            FROM sales
+            GROUP BY Branch, payment_method
+        ),
+        RankedPayments AS (
+            SELECT Branch, payment_method, method_count,
+                   RANK() OVER (PARTITION BY Branch ORDER BY method_count DESC) as rank
+            FROM PaymentCounts
+        )
+        SELECT Branch, payment_method, method_count
+        FROM RankedPayments
+        WHERE rank = 1;
+```
+
+### Output:
+| Branch   | payment_method   |   method_count |
+|:---------|:-----------------|---------------:|
+| WALM001  | Ewallet          |             45 |
+| WALM002  | Ewallet          |             37 |
+| WALM003  | Credit card      |            115 |
+| WALM004  | Ewallet          |             44 |
+| WALM005  | Ewallet          |             56 |
+| WALM006  | Ewallet          |             50 |
+| WALM007  | Ewallet          |             52 |
+| WALM008  | Ewallet          |             39 |
+| WALM009  | Credit card      |            139 |
+| WALM010  | Ewallet          |             47 |
+| WALM011  | Ewallet          |             39 |
+| WALM012  | Ewallet          |             52 |
+| WALM013  | Ewallet          |             44 |
+| WALM014  | Ewallet          |             28 |
+| WALM015  | Ewallet          |             57 |
+| WALM016  | Ewallet          |             46 |
+| WALM017  | Ewallet          |             46 |
+| WALM018  | Ewallet          |             46 |
+| WALM019  | Ewallet          |             42 |
+| WALM020  | Ewallet          |             49 |
+| WALM021  | Ewallet          |             42 |
+| WALM022  | Ewallet          |             46 |
+| WALM023  | Ewallet          |             39 |
+| WALM024  | Ewallet          |             50 |
+| WALM025  | Credit card      |             88 |
+| WALM026  | Ewallet          |             45 |
+| WALM027  | Ewallet          |             50 |
+| WALM028  | Ewallet          |             47 |
+| WALM029  | Credit card      |            113 |
+| WALM030  | Credit card      |            120 |
+| WALM031  | Ewallet          |             34 |
+| WALM032  | Credit card      |            107 |
+| WALM033  | Ewallet          |             39 |
+| WALM034  | Ewallet          |             37 |
+| WALM035  | Credit card      |             97 |
+| WALM036  | Ewallet          |             49 |
+| WALM037  | Ewallet          |             44 |
+| WALM038  | Credit card      |            111 |
+| WALM039  | Ewallet          |             41 |
+| WALM040  | Ewallet          |             45 |
+| WALM041  | Ewallet          |             59 |
+| WALM042  | Ewallet          |             36 |
+| WALM043  | Ewallet          |             58 |
+| WALM044  | Ewallet          |             48 |
+| WALM045  | Credit card      |             64 |
+| WALM046  | Credit card      |            117 |
+| WALM047  | Ewallet          |             57 |
+| WALM048  | Ewallet          |             44 |
+| WALM049  | Ewallet          |             45 |
+| WALM050  | Ewallet          |            108 |
+| WALM051  | Ewallet          |             38 |
+| WALM052  | Ewallet          |             50 |
+| WALM053  | Ewallet          |             55 |
+| WALM054  | Credit card      |            106 |
+| WALM055  | Credit card      |            122 |
+| WALM056  | Credit card      |             99 |
+| WALM057  | Ewallet          |             43 |
+| WALM058  | Credit card      |            145 |
+| WALM059  | Ewallet          |             50 |
+| WALM060  | Ewallet          |             48 |
+| WALM061  | Ewallet          |             44 |
+| WALM062  | Ewallet          |             53 |
+| WALM063  | Ewallet          |             56 |
+| WALM064  | Ewallet          |             44 |
+| WALM065  | Credit card      |            102 |
+| WALM066  | Ewallet          |             42 |
+| WALM067  | Ewallet          |             39 |
+| WALM068  | Ewallet          |             36 |
+| WALM069  | Credit card      |            118 |
+| WALM070  | Ewallet          |             42 |
+| WALM071  | Ewallet          |             46 |
+| WALM072  | Ewallet          |             36 |
+| WALM073  | Credit card      |            104 |
+| WALM074  | Cash             |            121 |
+| WALM075  | Credit card      |            115 |
+| WALM076  | Ewallet          |             51 |
+| WALM077  | Ewallet          |             52 |
+| WALM078  | Ewallet          |             51 |
+| WALM079  | Ewallet          |             46 |
+| WALM080  | Ewallet          |             51 |
+| WALM081  | Ewallet          |             43 |
+| WALM082  | Cash             |            105 |
+| WALM083  | Ewallet          |             46 |
+| WALM084  | Credit card      |            125 |
+| WALM085  | Ewallet          |             57 |
+| WALM086  | Credit card      |            112 |
+| WALM087  | Credit card      |            117 |
+| WALM088  | Ewallet          |             55 |
+| WALM089  | Credit card      |            104 |
+| WALM090  | Ewallet          |             48 |
+| WALM091  | Ewallet          |             50 |
+| WALM092  | Ewallet          |             37 |
+| WALM093  | Ewallet          |             42 |
+| WALM094  | Ewallet          |             47 |
+| WALM095  | Ewallet          |             48 |
+| WALM096  | Ewallet          |             50 |
+| WALM097  | Ewallet          |             38 |
+| WALM098  | Ewallet          |             44 |
+| WALM099  | Credit card      |             83 |
+| WALM100  | Ewallet          |             42 |
+
+---
+
+## 8. Sales Shifts Throughout the Day
+```sql
+SELECT 
+            Branch,
+            CASE 
+                WHEN time BETWEEN '06:00:00' AND '11:59:59' THEN 'Morning'
+                WHEN time BETWEEN '12:00:00' AND '17:59:59' THEN 'Afternoon'
+                ELSE 'Evening'
+            END AS shift,
+            COUNT(*) AS transaction_count
+        FROM sales
+        GROUP BY Branch, shift
+        ORDER BY Branch, shift;
+```
+
+### Output:
+| Branch   | shift     |   transaction_count |
+|:---------|:----------|--------------------:|
+| WALM001  | Afternoon |                  36 |
+| WALM001  | Evening   |                  30 |
+| WALM001  | Morning   |                   8 |
+| WALM002  | Afternoon |                  29 |
+| WALM002  | Evening   |                  21 |
+| WALM002  | Morning   |                  15 |
+| WALM003  | Afternoon |                  95 |
+| WALM003  | Evening   |                  41 |
+| WALM003  | Morning   |                  50 |
+| WALM004  | Afternoon |                  27 |
+| WALM004  | Evening   |                  24 |
+| WALM004  | Morning   |                   9 |
+| WALM005  | Afternoon |                  34 |
+| WALM005  | Evening   |                  35 |
+| WALM005  | Morning   |                  15 |
+| WALM006  | Afternoon |                  33 |
+| WALM006  | Evening   |                  31 |
+| WALM006  | Morning   |                   7 |
+| WALM007  | Afternoon |                  27 |
+| WALM007  | Evening   |                  33 |
+| WALM007  | Morning   |                  10 |
+| WALM008  | Afternoon |                  29 |
+| WALM008  | Evening   |                  30 |
+| WALM008  | Morning   |                   9 |
+| WALM009  | Afternoon |                 112 |
+| WALM009  | Evening   |                  74 |
+| WALM009  | Morning   |                  49 |
+| WALM010  | Afternoon |                  33 |
+| WALM010  | Evening   |                  26 |
+| WALM010  | Morning   |                   7 |
+| WALM011  | Afternoon |                  36 |
+| WALM011  | Evening   |                  23 |
+| WALM011  | Morning   |                   9 |
+| WALM012  | Afternoon |                  33 |
+| WALM012  | Evening   |                  36 |
+| WALM012  | Morning   |                  11 |
+| WALM013  | Afternoon |                  28 |
+| WALM013  | Evening   |                  16 |
+| WALM013  | Morning   |                  13 |
+| WALM014  | Afternoon |                  21 |
+| WALM014  | Evening   |                  22 |
+| WALM014  | Morning   |                   9 |
+| WALM015  | Afternoon |                  33 |
+| WALM015  | Evening   |                  32 |
+| WALM015  | Morning   |                  22 |
+| WALM016  | Afternoon |                  36 |
+| WALM016  | Evening   |                  27 |
+| WALM016  | Morning   |                   7 |
+| WALM017  | Afternoon |                  33 |
+| WALM017  | Evening   |                  29 |
+| WALM017  | Morning   |                  14 |
+| WALM018  | Afternoon |                  30 |
+| WALM018  | Evening   |                  23 |
+| WALM018  | Morning   |                  11 |
+| WALM019  | Afternoon |                  41 |
+| WALM019  | Evening   |                  21 |
+| WALM019  | Morning   |                   9 |
+| WALM020  | Afternoon |                  37 |
+| WALM020  | Evening   |                  29 |
+| WALM020  | Morning   |                  10 |
+| WALM021  | Afternoon |                  33 |
+| WALM021  | Evening   |                  21 |
+| WALM021  | Morning   |                  11 |
+| WALM022  | Afternoon |                  37 |
+| WALM022  | Evening   |                  28 |
+| WALM022  | Morning   |                  10 |
+| WALM023  | Afternoon |                  35 |
+| WALM023  | Evening   |                  25 |
+| WALM023  | Morning   |                  10 |
+| WALM024  | Afternoon |                  32 |
+| WALM024  | Evening   |                  19 |
+| WALM024  | Morning   |                  14 |
+| WALM025  | Afternoon |                  78 |
+| WALM025  | Evening   |                  37 |
+| WALM025  | Morning   |                  45 |
+| WALM026  | Afternoon |                  36 |
+| WALM026  | Evening   |                  24 |
+| WALM026  | Morning   |                  13 |
+| WALM027  | Afternoon |                  24 |
+| WALM027  | Evening   |                  35 |
+| WALM027  | Morning   |                  13 |
+| WALM028  | Afternoon |                  21 |
+| WALM028  | Evening   |                  38 |
+| WALM028  | Morning   |                  11 |
+| WALM029  | Afternoon |                  98 |
+| WALM029  | Evening   |                  46 |
+| WALM029  | Morning   |                  52 |
+| WALM030  | Afternoon |                 107 |
+| WALM030  | Evening   |                  74 |
+| WALM030  | Morning   |                  48 |
+| WALM031  | Afternoon |                  22 |
+| WALM031  | Evening   |                  25 |
+| WALM031  | Morning   |                   9 |
+| WALM032  | Afternoon |                  75 |
+| WALM032  | Evening   |                  50 |
+| WALM032  | Morning   |                  45 |
+| WALM033  | Afternoon |                  20 |
+| WALM033  | Evening   |                  24 |
+| WALM033  | Morning   |                  13 |
+| WALM034  | Afternoon |                  17 |
+| WALM034  | Evening   |                  29 |
+| WALM034  | Morning   |                  10 |
+| WALM035  | Afternoon |                  85 |
+| WALM035  | Evening   |                  48 |
+| WALM035  | Morning   |                  40 |
+| WALM036  | Afternoon |                  31 |
+| WALM036  | Evening   |                  27 |
+| WALM036  | Morning   |                  15 |
+| WALM037  | Afternoon |                  28 |
+| WALM037  | Evening   |                  26 |
+| WALM037  | Morning   |                  12 |
+| WALM038  | Afternoon |                  98 |
+| WALM038  | Evening   |                  44 |
+| WALM038  | Morning   |                  47 |
+| WALM039  | Afternoon |                  28 |
+| WALM039  | Evening   |                  24 |
+| WALM039  | Morning   |                   7 |
+| WALM040  | Afternoon |                  25 |
+| WALM040  | Evening   |                  28 |
+| WALM040  | Morning   |                  16 |
+| WALM041  | Afternoon |                  27 |
+| WALM041  | Evening   |                  32 |
+| WALM041  | Morning   |                   8 |
+| WALM042  | Afternoon |                  30 |
+| WALM042  | Evening   |                  20 |
+| WALM042  | Morning   |                  14 |
+| WALM043  | Afternoon |                  33 |
+| WALM043  | Evening   |                  31 |
+| WALM043  | Morning   |                  16 |
+| WALM044  | Afternoon |                  32 |
+| WALM044  | Evening   |                  23 |
+| WALM044  | Morning   |                  15 |
+| WALM045  | Afternoon |                  41 |
+| WALM045  | Evening   |                  18 |
+| WALM045  | Morning   |                   7 |
+| WALM046  | Afternoon |                  94 |
+| WALM046  | Evening   |                  56 |
+| WALM046  | Morning   |                  41 |
+| WALM047  | Afternoon |                  30 |
+| WALM047  | Evening   |                  33 |
+| WALM047  | Morning   |                  18 |
+| WALM048  | Afternoon |                  30 |
+| WALM048  | Evening   |                  37 |
+| WALM048  | Morning   |                  12 |
+| WALM049  | Afternoon |                  28 |
+| WALM049  | Evening   |                  29 |
+| WALM049  | Morning   |                  14 |
+| WALM050  | Afternoon |                  75 |
+| WALM050  | Evening   |                  38 |
+| WALM050  | Morning   |                  38 |
+| WALM051  | Afternoon |                  32 |
+| WALM051  | Evening   |                  31 |
+| WALM051  | Morning   |                   5 |
+| WALM052  | Afternoon |                  34 |
+| WALM052  | Evening   |                  31 |
+| WALM052  | Morning   |                  14 |
+| WALM053  | Afternoon |                  31 |
+| WALM053  | Evening   |                  28 |
+| WALM053  | Morning   |                  15 |
+| WALM054  | Afternoon |                  78 |
+| WALM054  | Evening   |                  42 |
+| WALM054  | Morning   |                  55 |
+| WALM055  | Afternoon |                  88 |
+| WALM055  | Evening   |                  54 |
+| WALM055  | Morning   |                  44 |
+| WALM056  | Afternoon |                  76 |
+| WALM056  | Evening   |                  44 |
+| WALM056  | Morning   |                  49 |
+| WALM057  | Afternoon |                  29 |
+| WALM057  | Evening   |                  26 |
+| WALM057  | Morning   |                  16 |
+| WALM058  | Afternoon |                 113 |
+| WALM058  | Evening   |                  72 |
+| WALM058  | Morning   |                  54 |
+| WALM059  | Afternoon |                  34 |
+| WALM059  | Evening   |                  28 |
+| WALM059  | Morning   |                  17 |
+| WALM060  | Afternoon |                  37 |
+| WALM060  | Evening   |                  28 |
+| WALM060  | Morning   |                  14 |
+| WALM061  | Afternoon |                  31 |
+| WALM061  | Evening   |                  28 |
+| WALM061  | Morning   |                  10 |
+| WALM062  | Afternoon |                  39 |
+| WALM062  | Evening   |                  24 |
+| WALM062  | Morning   |                  12 |
+| WALM063  | Afternoon |                  34 |
+| WALM063  | Evening   |                  23 |
+| WALM063  | Morning   |                  24 |
+| WALM064  | Afternoon |                  29 |
+| WALM064  | Evening   |                  22 |
+| WALM064  | Morning   |                  13 |
+| WALM065  | Afternoon |                  78 |
+| WALM065  | Evening   |                  51 |
+| WALM065  | Morning   |                  47 |
+| WALM066  | Afternoon |                  38 |
+| WALM066  | Evening   |                  28 |
+| WALM066  | Morning   |                   9 |
+| WALM067  | Afternoon |                  34 |
+| WALM067  | Evening   |                  24 |
+| WALM067  | Morning   |                  15 |
+| WALM068  | Afternoon |                  28 |
+| WALM068  | Evening   |                  22 |
+| WALM068  | Morning   |                   9 |
+| WALM069  | Afternoon |                  95 |
+| WALM069  | Evening   |                  79 |
+| WALM069  | Morning   |                  48 |
+| WALM070  | Afternoon |                  36 |
+| WALM070  | Evening   |                  21 |
+| WALM070  | Morning   |                  11 |
+| WALM071  | Afternoon |                  31 |
+| WALM071  | Evening   |                  24 |
+| WALM071  | Morning   |                  14 |
+| WALM072  | Afternoon |                  36 |
+| WALM072  | Evening   |                  18 |
+| WALM072  | Morning   |                   9 |
+| WALM073  | Afternoon |                  84 |
+| WALM073  | Evening   |                  43 |
+| WALM073  | Morning   |                  36 |
+| WALM074  | Afternoon |                  97 |
+| WALM074  | Evening   |                  55 |
+| WALM074  | Morning   |                  58 |
+| WALM075  | Afternoon |                 103 |
+| WALM075  | Evening   |                  42 |
+| WALM075  | Morning   |                  43 |
+| WALM076  | Afternoon |                  32 |
+| WALM076  | Evening   |                  31 |
+| WALM076  | Morning   |                  11 |
+| WALM077  | Afternoon |                  31 |
+| WALM077  | Evening   |                  21 |
+| WALM077  | Morning   |                  13 |
+| WALM078  | Afternoon |                  36 |
+| WALM078  | Evening   |                  27 |
+| WALM078  | Morning   |                  15 |
+| WALM079  | Afternoon |                  35 |
+| WALM079  | Evening   |                  18 |
+| WALM079  | Morning   |                  12 |
+| WALM080  | Afternoon |                  33 |
+| WALM080  | Evening   |                  28 |
+| WALM080  | Morning   |                  14 |
+| WALM081  | Afternoon |                  33 |
+| WALM081  | Evening   |                  23 |
+| WALM081  | Morning   |                  12 |
+| WALM082  | Afternoon |                  94 |
+| WALM082  | Evening   |                  47 |
+| WALM082  | Morning   |                  45 |
+| WALM083  | Afternoon |                  37 |
+| WALM083  | Evening   |                  27 |
+| WALM083  | Morning   |                   8 |
+| WALM084  | Afternoon |                  99 |
+| WALM084  | Evening   |                  58 |
+| WALM084  | Morning   |                  48 |
+| WALM085  | Afternoon |                  29 |
+| WALM085  | Evening   |                  33 |
+| WALM085  | Morning   |                  13 |
+| WALM086  | Afternoon |                  82 |
+| WALM086  | Evening   |                  47 |
+| WALM086  | Morning   |                  48 |
+| WALM087  | Afternoon |                  95 |
+| WALM087  | Evening   |                  51 |
+| WALM087  | Morning   |                  46 |
+| WALM088  | Afternoon |                  37 |
+| WALM088  | Evening   |                  26 |
+| WALM088  | Morning   |                  16 |
+| WALM089  | Afternoon |                  86 |
+| WALM089  | Evening   |                  40 |
+| WALM089  | Morning   |                  56 |
+| WALM090  | Afternoon |                  28 |
+| WALM090  | Evening   |                  36 |
+| WALM090  | Morning   |                  12 |
+| WALM091  | Afternoon |                  30 |
+| WALM091  | Evening   |                  31 |
+| WALM091  | Morning   |                  15 |
+| WALM092  | Afternoon |                  31 |
+| WALM092  | Evening   |                  12 |
+| WALM092  | Morning   |                   8 |
+| WALM093  | Afternoon |                  33 |
+| WALM093  | Evening   |                  23 |
+| WALM093  | Morning   |                  11 |
+| WALM094  | Afternoon |                  35 |
+| WALM094  | Evening   |                  22 |
+| WALM094  | Morning   |                  11 |
+| WALM095  | Afternoon |                  40 |
+| WALM095  | Evening   |                  28 |
+| WALM095  | Morning   |                  15 |
+| WALM096  | Afternoon |                  34 |
+| WALM096  | Evening   |                  27 |
+| WALM096  | Morning   |                  18 |
+| WALM097  | Afternoon |                  26 |
+| WALM097  | Evening   |                  27 |
+| WALM097  | Morning   |                  14 |
+| WALM098  | Afternoon |                  25 |
+| WALM098  | Evening   |                  32 |
+| WALM098  | Morning   |                   8 |
+| WALM099  | Afternoon |                  93 |
+| WALM099  | Evening   |                  32 |
+| WALM099  | Morning   |                  40 |
+| WALM100  | Afternoon |                  24 |
+| WALM100  | Evening   |                  19 |
+| WALM100  | Morning   |                  19 |
+
+---
+
+## 9. Branches with Highest Revenue Decline Year-Over-Year
+```sql
+WITH YearlyRevenue AS (
+            SELECT Branch, strftime('%Y', date) as year, SUM(unit_price * quantity) as revenue
+            FROM sales
+            WHERE date IS NOT NULL
+            GROUP BY Branch, year
+        ),
+        RevenueChanges AS (
+            SELECT Branch, year, revenue,
+                   LAG(revenue) OVER (PARTITION BY Branch ORDER BY year) as prev_year_revenue
+            FROM YearlyRevenue
+        )
+        SELECT Branch, year as current_year,
+               ROUND(revenue, 2) as current_revenue,
+               ROUND(prev_year_revenue, 2) as previous_revenue,
+               ROUND(revenue - prev_year_revenue, 2) as revenue_change
+        FROM RevenueChanges
+        WHERE prev_year_revenue IS NOT NULL AND (revenue - prev_year_revenue) < 0
+        ORDER BY revenue_change ASC
+        LIMIT 10;
+```
+
+### Output:
+| Branch   |   current_year |   current_revenue |   previous_revenue |   revenue_change |
+|:---------|---------------:|------------------:|-------------------:|-----------------:|
+| WALM095  |           2020 |              1495 |            6323.65 |         -4828.65 |
+| WALM057  |           2020 |              1147 |            5891.74 |         -4744.74 |
+| WALM049  |           2020 |               990 |            5369.81 |         -4379.81 |
+| WALM042  |           2020 |              1792 |            5942.71 |         -4150.71 |
+| WALM017  |           2020 |              1679 |            5569.71 |         -3890.71 |
+| WALM070  |           2020 |              1033 |            4777.01 |         -3744.01 |
+| WALM088  |           2020 |              1905 |            5463.27 |         -3558.27 |
+| WALM063  |           2020 |               737 |            3939.08 |         -3202.08 |
+| WALM059  |           2020 |              1984 |            4999.25 |         -3015.25 |
+| WALM071  |           2020 |               716 |            3706.19 |         -2990.19 |
